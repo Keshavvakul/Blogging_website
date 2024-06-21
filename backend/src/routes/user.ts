@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { sign } from "hono/jwt";
+import { signinInput, signupInput } from "@keshavvakul/common";
 
 export const userRouter = new Hono<{
   Bindings: {
@@ -16,6 +17,11 @@ userRouter.post("/signup", async (c) => {
   }).$extends(withAccelerate());
   const body = await c.req.json();
   try {
+    const { success } = signupInput.safeParse(body);
+    if (!success) {
+      c.status(411);
+      return c.text("Wrong inputs!");
+    }
     // No need to check is user already exists because in schema i have email
     // set to uniqe so it will automatically throw an error so try catch is enough.
     const user = await prisma.user.create({
@@ -41,6 +47,11 @@ userRouter.post("/signin", async (c) => {
 
   const body = await c.req.json();
   try {
+    const { success } = signinInput.safeParse(body);
+    if (!success) {
+      c.status(411);
+      return c.text("wrong inputs");
+    }
     if (!body.email || !body.password) {
       c.status(403);
       return c.text("Pass both email and password");
