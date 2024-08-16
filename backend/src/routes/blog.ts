@@ -16,11 +16,12 @@ export const blogRouter = new Hono<{
 
 blogRouter.use("/*", async (c, next) => {
   try {
-    const authHeader = c.req.header("authorization");
-    const token = authHeader?.split(" ")[1];
+    const token = c.req.header("authorization");
+    console.log(token);
     if (token) {
       const response = await verify(token, c.env.JWT_SECRET);
       if (response) {
+        console.log(response);
         const responseString = JSON.stringify(response.id);
         c.set("userId", responseString);
         await next();
@@ -39,6 +40,10 @@ blogRouter.use("/*", async (c, next) => {
 
 blogRouter.post("/", async (c) => {
   const body = await c.req.json();
+  if (!body || !body.title || !body.content) {
+    c.status(400);
+    return c.text("Please pass all inputs");
+  }
   const authorId = JSON.parse(c.get("userId"));
   console.log(authorId);
   const prisma = new PrismaClient({
@@ -69,36 +74,34 @@ blogRouter.post("/", async (c) => {
   }
 });
 
-blogRouter.put("/", async (c) => {
-  const body = await c.req.json();
+blogRouter.put("/:id", async (c) => {
+  const rawId = c.req.param("id");
+  const id = rawId.replace(/^:/, "");
+  const authorId = JSON.parse(c.get("userId"));
+  console.log(id);
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
 
   try {
-    const { success } = updateBlogInput.safeParse(body);
-    if (!success) {
-      c.status(411);
-      return c.text("Wrong inputs");
-    }
     const updateBlog = await prisma.post.update({
       where: {
-        id: body.id,
+        id: id,
+        authorId: authorId,
       },
       data: {
-        title: body.title,
-        content: body.content,
+        published: true,
       },
     });
     console.log(updateBlog);
     return c.json({
       id: updateBlog.id,
-      msg: "Blog updated",
+      msg: "Blog deleted",
     });
   } catch (e) {
     console.log(e);
     c.status(400);
-    return c.text("Error while updating the blog");
+    return c.text("Error while deleting the blog");
   }
 });
 
@@ -108,14 +111,30 @@ blogRouter.get("/bulk", async (c) => {
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
 
-  const bulkBlogs = await prisma.post.findMany();
+  const bulkBlogs = await prisma.post.findMany({
+    select: {
+      id: true,
+      title: true,
+      content: true,
+      author: {
+        select: {
+          name: true,
+        },
+      },
+    },
+    where: {
+      published: false,
+    },
+  });
   return c.json({
     bulkBlogs,
   });
 });
 
 blogRouter.get("/:id", async (c) => {
-  const id = c.req.param("id");
+  const rawId = c.req.param("id");
+  const id = rawId.replace(/^:/, "");
+  console.log(id);
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
@@ -125,7 +144,17 @@ blogRouter.get("/:id", async (c) => {
       where: {
         id: id,
       },
+      select: {
+        title: true,
+        content: true,
+        author: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
+    console.log(getBlogs);
     return c.json({
       getBlogs,
     });

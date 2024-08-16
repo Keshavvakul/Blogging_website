@@ -1,0 +1,35 @@
+.ql-toolbar.ql-snow {
+  border: none;
+}
+
+.ql-editor.ql-blank {
+  font-size: 21px;
+}
+
+.ql-editor:focus-visible {
+  outline: none;
+  font-size: 21px;
+}
+
+.show-toolbar.ql-toolbar.ql-snow {
+  display: block;
+  border: none;
+}
+
+.hide-toolbar.ql-toolbar.ql-snow {
+  display: none;
+  border: none;
+}
+
+.ql-container.ql-snow {
+  border: none;
+  font-size: 21px;
+}
+
+.ql-container {
+  font-size: 36px;
+}
+
+.ql-editor.ql-blank {
+  outline: none;
+}
