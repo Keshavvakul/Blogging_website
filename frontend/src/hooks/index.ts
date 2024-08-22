@@ -26,7 +26,7 @@ export const useBlog = ({ id }: { id: string }) => {
         setBlog(response.data.getBlogs);
       })
       .catch((e) => {
-        alert("Error passing inputs please checl");
+        alert("Error passing inputs please check");
         console.log(e);
       })
       .finally(() => {
