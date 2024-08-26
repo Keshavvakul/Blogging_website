@@ -7,7 +7,6 @@ import "react-quill/dist/quill.bubble.css";
 import { publishBlog } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
-const imageArray: File[] = [];
 
 interface ImageHandlerTypes {
   quillRef: React.RefObject<ReactQuill>;
@@ -26,23 +25,20 @@ const imageHandler = ({
   input.setAttribute("type", "file");
   input.setAttribute("accept", "image/*");
   input.click();
-  console.log(input);
+  console.log("input in image handler ",input);
 
   input.onchange = async () => {
     const file = input.files ? input.files[0] : null;
     console.log(file);
-    console.log("image array contains", imageArray);
 
     if (file) {
-      imageArray.push(file);
-
       const reader = new FileReader();
       reader.readAsDataURL(file);
 
-      console.log("Reader: ", reader);
+      console.log("Reader in image handler : ", reader);
 
       reader.onload = (e) => {
-        console.log("reader.onload called");
+        console.log("reader.onload called inside image handler");
         const imageResult = e.target?.result as string;
 
         if (imageResult) {
@@ -79,7 +75,7 @@ const ImagePreview = memo(({ imagePreviewArray }: ImagePreviewProps) => {
     <>
       <div className="flex justify-center pr-96">
         <div className="flex justify-center flex-wrap gap-4">
-          {console.log("image preview array is: ", imagePreviewArray)}
+          {/*console.log("image preview array is: ", imagePreviewArray)*/}
           {imagePreviewArray.map((preview, index) => (
             <img
               className="max-w-3xl "
@@ -122,7 +118,7 @@ const Editor = () => {
 
   const handlePublish = async () => {
     try {
-      const result = await publishBlog(title, content);
+      const result = await publishBlog(title, content, imagePreviewArray);
       console.log("Post Published", result);
       navigate(`/blog/${result.id}`);
     } catch (e) {
