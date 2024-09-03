@@ -47,6 +47,7 @@ const AllBlogs = () => {
           published={"Jun 29 2024"}
           title={blog.title}
           content={blog.content}
+          image={blog.presignedImageUrl}
           id={blog.id}
         />
       ))}

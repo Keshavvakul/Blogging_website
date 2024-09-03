@@ -40,7 +40,12 @@ blogRouter.use("/*", async (c, next) => {
 
 blogRouter.post("/", async (c) => {
   const body = await c.req.json();
-  if (!body || !body.title || !body.content) {
+  if (
+    !body ||
+    !body.title ||
+    !body.content ||
+    !Array.isArray(body.blogImagePath)
+  ) {
     c.status(400);
     return c.text("Please pass all inputs");
   }
@@ -60,6 +65,7 @@ blogRouter.post("/", async (c) => {
       data: {
         title: body.title,
         content: body.content,
+        blogImagePath: body.blogImagePath,
         authorId: authorId,
       },
     });
@@ -116,6 +122,7 @@ blogRouter.get("/bulk", async (c) => {
       id: true,
       title: true,
       content: true,
+      blogImagePath: true,
       author: {
         select: {
           name: true,
@@ -147,6 +154,7 @@ blogRouter.get("/:id", async (c) => {
       select: {
         title: true,
         content: true,
+        blogImagePath: true,
         author: {
           select: {
             name: true,

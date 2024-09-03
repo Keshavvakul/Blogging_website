@@ -3,13 +3,12 @@ import { BACKEND_URL, S3BACKEND_URL } from "../config";
 import { v4 as uuidv4 } from "uuid";
 import { base64ToBlob } from "../utility/base64Utility";
 
-const fileNameArray: string[] = [];
-
 export const publishBlog = async (
   title: string,
   content: string,
   imageArray: string[],
 ) => {
+  const fileNameArray: string[] = [];
   try {
     console.log("inside publish blog");
     console.log(imageArray);
@@ -68,6 +67,7 @@ export const publishBlog = async (
       {
         title,
         content,
+        blogImagePath: fileNameArray,
       },
       {
         headers: {

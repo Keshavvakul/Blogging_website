@@ -1,13 +1,16 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { BACKEND_URL } from "../config";
+import { fetchGetPresignedUrls } from "../utility/getBulkPresignedUrls";
 
 export interface BlogsType {
-  id: any;
-  title: any;
-  content: any;
+  id: string;
+  title: string;
+  content: string;
+  blogImagePath?: string[];
+  presignedImageUrl: any;
   author: {
-    name: any;
+    name: string;
   };
 }
 
@@ -52,10 +55,25 @@ export const useBlogs = () => {
         },
       })
       .then((response) => {
-        setBlogs(response.data.bulkBlogs);
+        return fetchGetPresignedUrls(response.data.bulkBlogs);
+      })
+      .then((blogWithPresignedUrl) => {
+        if (blogWithPresignedUrl) {
+          console.log("blogWithPresignedUrl", blogWithPresignedUrl);
+          setBlogs(blogWithPresignedUrl);
+        } else {
+          setBlogs([]);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching blogs:", error);
+        setBlogs([]);
+      })
+      .finally(() => {
         setLoading(false);
       });
   }, []);
+
   return {
     loading,
     blogs,

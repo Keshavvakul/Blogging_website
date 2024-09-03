@@ -7,6 +7,7 @@ interface BlogCardProps {
   authorName: string;
   title: string;
   content: string;
+  image: string;
   published: string;
   id: string;
 }
@@ -16,13 +17,16 @@ export const BlogCard: React.FC<BlogCardProps> = ({
   published,
   title,
   content,
+  image,
   id,
 }) => {
   return (
     <Link to={`/blog/${id}`}>
       <>
         <div className="justify-center flex p-4">
-          <div className="cursor-pointer w-screen max-w-screen-md">
+          <div
+            className={`${image ? "cursor-pointer pl-96 -mr-36" : "cursor-pointer w-screen max-w-screen-md"}`}
+          >
             <div className="flex flex-row">
               <div className="py-1">
                 <Avatar authorName={authorName} />
@@ -40,7 +44,10 @@ export const BlogCard: React.FC<BlogCardProps> = ({
                 : htmlToText(content)}
             </div>
             <div className="text-slate-500 pt-8">{`${Math.ceil(content.length / 100)} min read`}</div>
-            <hr className="h-px mt-12 bg-slate-200 border-0 dark:bg-slate-200" />
+            <hr className="h-px mt-16 w-screen max-w-screen-lg bg-slate-200 border-0 dark:bg-slate-200" />
+          </div>
+          <div className={`${image ? "-ml-10" : "hidden"}`}>
+            {image && <img src={image} alt="" width="300" height="300" />}
           </div>
         </div>
       </>
